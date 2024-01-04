@@ -29,7 +29,7 @@
     "vite": "^3.2.5"
   },
   "peerDependencies": {
-    "three": ">=0.154"
+    "three": ">=0.137"
   },
   "scripts": {
     "dev": "vite demo",
