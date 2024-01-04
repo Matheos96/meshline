@@ -177,7 +177,11 @@ export class MeshLineGeometry extends THREE.BufferGeometry {
     if (this.compareV3(0, l - 1)) {
       v = this.copyV3(l - 2)
     } else {
-      v = this.copyV3(0)
+      v = [
+        this.positions[0] - (this.positions[6] - this.positions[0]),
+        this.positions[1] - (this.positions[6+1] - this.positions[1]),
+        this.positions[2] - (this.positions[6+2] - this.positions[2])
+      ]
     }
     this.previous.push(v[0], v[1], v[2])
     this.previous.push(v[0], v[1], v[2])
@@ -220,12 +224,16 @@ export class MeshLineGeometry extends THREE.BufferGeometry {
     if (this.compareV3(l - 1, 0)) {
       v = this.copyV3(1)
     } else {
-      v = this.copyV3(l - 1)
+      v = [
+        this.positions[l - 1] + (this.positions[l - 1] - this.positions[l - 1 - 6]),
+        this.positions[l - 2] + (this.positions[l - 2] - this.positions[l - 2 - 6]),
+        this.positions[l - 3] + (this.positions[l - 3] - this.positions[l - 3 - 6])
+      ]
     }
     this.next.push(v[0], v[1], v[2])
     this.next.push(v[0], v[1], v[2])
 
-    if (!this._attributes || this._attributes.position.count !== this.positions.length) {
+    if (!this._attributes || this._attributes.position.count !== this.counters.length) {
       this._attributes = {
         position: new THREE.BufferAttribute(new Float32Array(this.positions), 3),
         previous: new THREE.BufferAttribute(new Float32Array(this.previous), 3),
