@@ -130,11 +130,7 @@ class MeshLineGeometry extends THREE__namespace.BufferGeometry {
     if (this.compareV3(0, l - 1)) {
       v = this.copyV3(l - 2);
     } else {
-      v = [
-        this.positions[0] - (this.positions[6] - this.positions[0]),
-        this.positions[1] - (this.positions[6 + 1] - this.positions[1]),
-        this.positions[2] - (this.positions[6 + 2] - this.positions[2])
-      ];
+      v = this.copyV3(0);
     }
     this.previous.push(v[0], v[1], v[2]);
     this.previous.push(v[0], v[1], v[2]);
@@ -166,11 +162,7 @@ class MeshLineGeometry extends THREE__namespace.BufferGeometry {
     if (this.compareV3(l - 1, 0)) {
       v = this.copyV3(1);
     } else {
-      v = [
-        this.positions[l - 1] + (this.positions[l - 1] - this.positions[l - 1 - 6]),
-        this.positions[l - 2] + (this.positions[l - 2] - this.positions[l - 2 - 6]),
-        this.positions[l - 3] + (this.positions[l - 3] - this.positions[l - 3 - 6])
-      ];
+      v = this.copyV3(l - 1);
     }
     this.next.push(v[0], v[1], v[2]);
     this.next.push(v[0], v[1], v[2]);
@@ -288,13 +280,18 @@ const vertexShader = `
   
     float w = lineWidth * width;
   
-    vec2 dir1 = normalize(currentP - prevP);
-    vec2 dir2 = normalize(nextP - currentP);
-    vec2 dir = normalize(dir1 + dir2);
-
-    vec2 perp = vec2(-dir1.y, dir1.x);
-    vec2 miter = vec2(-dir.y, dir.x);
-    //w = clamp(w / dot(miter, perp), 0., 4. * lineWidth * width);
+    vec2 dir;
+    if (nextP == currentP) dir = normalize(currentP - prevP);
+    else if (prevP == currentP) dir = normalize(nextP - currentP);
+    else {
+      vec2 dir1 = normalize(currentP - prevP);
+      vec2 dir2 = normalize(nextP - currentP);
+      dir = normalize(dir1 + dir2);
+  
+      vec2 perp = vec2(-dir1.y, dir1.x);
+      vec2 miter = vec2(-dir.y, dir.x);
+      //w = clamp(w / dot(miter, perp), 0., 4. * lineWidth * width);
+    }
   
     //vec2 normal = (cross(vec3(dir, 0.), vec3(0., 0., 1.))).xy;
     vec4 normal = vec4(-dir.y, dir.x, 0., 1.);
